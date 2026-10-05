@@ -1,0 +1,26 @@
+{
+  "name": "rohan-motion-showreel",
+  "version": "1.0.0",
+  "description": "15-second procedural motion design showreel",
+  "main": "index.js",
+  "scripts": {
+    "render": "node render.js showreel.mp4",
+    "preview": "node render.js showreel-preview.mp4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rohanrathod8055-maker/original-video.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rohanrathod8055-maker/original-video/issues"
+  },
+  "homepage": "https://github.com/rohanrathod8055-maker/original-video#readme",
+  "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2",
+    "@napi-rs/canvas": "^1.0.10"
+  }
+}
