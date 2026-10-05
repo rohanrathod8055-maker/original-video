@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rohan Rathod — Motion Design Showreel</title>
+  <style>
+    :root { color-scheme: dark; --ink:#0b0b0d; --paper:#f2f0e8; --orange:#ff4b22; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--ink); color:var(--paper); font-family:Arial,Helvetica,sans-serif; display:grid; place-items:center; }
+    main { width:min(1180px,calc(100% - 32px)); padding:28px 0 40px; }
+    header { display:flex; justify-content:space-between; align-items:end; margin-bottom:18px; gap:16px; }
+    .eyebrow { color:var(--orange); font:12px monospace; letter-spacing:.18em; margin-bottom:7px; }
+    h1 { font-size:clamp(24px,4vw,48px); margin:0; line-height:.95; letter-spacing:-.04em; }
+    .meta { color:#999; font:12px monospace; white-space:nowrap; }
+    .frame { padding:8px; border:1px solid #333; background:#151518; box-shadow:0 24px 80px #000; }
+    video { display:block; width:100%; aspect-ratio:16/9; background:#000; }
+    footer { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:18px; }
+    p { margin:0; color:#aaa; font:13px/1.5 monospace; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:end; }
+    a { display:inline-block; text-decoration:none; padding:12px 18px; border:1px solid #444; color:var(--paper); font:bold 12px monospace; letter-spacing:.08em; }
+    a.primary { background:var(--orange); border-color:var(--orange); color:var(--ink); }
+    a:hover { transform:translateY(-2px); filter:brightness(1.1); }
+    @media(max-width:650px){ header,footer{align-items:flex-start;flex-direction:column}.actions{justify-content:start}.meta{white-space:normal} }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div><div class="eyebrow">SHOWREEL / 2026</div><h1>ROHAN RATHOD</h1></div>
+      <div class="meta">15 SEC · 1280×720 · H.264/AAC</div>
+    </header>
+    <section class="frame">
+      <video controls autoplay muted playsinline preload="auto" poster="">
+        <source src="showreel.mp4" type="video/mp4" />
+        Your browser does not support HTML5 video.
+      </video>
+    </section>
+    <footer>
+      <p>MOTION DESIGNER<br>EVERY FRAME HAS A JOB.</p>
+      <div class="actions">
+        <a href="showreel.mp4" download="Rohan-Rathod-Motion-Showreel.mp4">DOWNLOAD MP4</a>
+        <a class="primary" href="motion-design-showreel.zip" download>DOWNLOAD ZIP</a>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>
