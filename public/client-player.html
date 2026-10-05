@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLAUDE — MOTION REEL 2026 (Pure Code Recreation)</title>
+  <!-- Google Fonts: Space Grotesk, JetBrains Mono, Syne, Instrument Serif -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700;800&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    :root {
+      --bg: #090A0D;
+      --orange: #FF4A13;
+      --blue: #2442FF;
+      --white: #F4F3EE;
+      --charcoal: #111215;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Space Grotesk', system-ui, sans-serif;
+      --serif: 'Instrument Serif', Georgia, serif;
+      --display: 'Syne', sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #030406;
+      color: #fff;
+      font-family: var(--sans);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Container for 16:9 stage */
+    #viewport-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #020304;
+      overflow: hidden;
+    }
+
+    #stage-wrapper {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #stage {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      background: #0B0C0F;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      transform-origin: center center;
+      border-radius: 4px;
+    }
+
+    /* Original Video Comparison Pane (Hidden by default) */
+    #compare-stage {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      background: #000;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 74, 19, 0.3);
+      overflow: hidden;
+      border-radius: 4px;
+      display: none;
+    }
+
+    #compare-stage video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .stage-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: #fff;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Rendering Canvas for animations */
+    #main-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Grain & Vignette Overlay */
+    #fx-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      background: radial-gradient(circle at 50% 50%, transparent 62%, rgba(0, 0, 0, 0.62) 100%);
+    }
+
+    .noise-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.10;
+      z-index: 6;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* HUD Layer */
+    #hud-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      padding: 30px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      color: rgba(255, 255, 255, 0.78);
+      text-transform: uppercase;
+    }
+
+    .hud-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hud-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hud-bracket {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .hud-text {
+      color: rgba(255, 255, 255, 0.84);
+    }
+
+    .bpm-boxes {
+      display: inline-flex;
+      gap: 5px;
+      margin-left: 6px;
+    }
+
+    .bpm-box {
+      width: 9px;
+      height: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: transparent;
+      transition: background 0.05s ease, border-color 0.05s ease;
+    }
+
+    .bpm-box.active {
+      background: var(--orange);
+      border-color: var(--orange);
+      box-shadow: 0 0 10px rgba(255, 74, 19, 0.8);
+    }
+
+    /* Bottom Control Bar */
+    #controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 18px;
+      background: rgba(12, 14, 18, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: #ccc;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    #controls.faded {
+      opacity: 0.15;
+      transform: translateX(-50%) translateY(8px);
+    }
+
+    #controls:hover {
+      opacity: 1 !important;
+      transform: translateX(-50%) translateY(0) !important;
+    }
+
+    .ctrl-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .ctrl-btn.active {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+    }
+
+    #scrubber-container {
+      width: 240px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    #scrubber {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    #scrubber::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--orange);
+      transition: transform 0.1s;
+    }
+
+    #scrubber::-webkit-slider-thumb:hover {
+      transform: scale(1.35);
+    }
+
+    #time-display {
+      min-width: 95px;
+      color: #aaa;
+    }
+
+    #time-display b {
+      color: #fff;
+    }
+
+    /* Start Overlay Prompt */
+    #start-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      background: rgba(5, 6, 9, 0.90);
+      backdrop-filter: blur(14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      cursor: pointer;
+      transition: opacity 0.4s ease;
+    }
+
+    #start-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .play-circle {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      background: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 50px rgba(255, 74, 19, 0.6);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .play-circle:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 70px rgba(255, 74, 19, 0.9);
+    }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-left: 24px solid #fff;
+      margin-left: 5px;
+    }
+
+    .start-title {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+
+    .start-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="viewport-container">
+    <div id="stage-wrapper">
+      <!-- Original Video Comparison View (Toggled by "COMPARE" button) -->
+      <div id="compare-stage">
+        <div class="stage-badge">ORIGINAL VIDEO (MP4)</div>
+        <video id="ref-video" src="original.mp4" playsinline muted preload="auto"></video>
+      </div>
+
+      <!-- Pure Code Recreation Stage -->
+      <div id="stage">
+        <div class="stage-badge" id="code-badge" style="display:none;">CODE RECREATION (100% CANVAS)</div>
+        <!-- 2D / 3D Canvas Rendering -->
+        <canvas id="main-canvas" width="1280" height="720"></canvas>
+
+        <!-- Shaders & Grain -->
+        <div id="fx-overlay"></div>
+        <div class="noise-layer"></div>
+
+        <!-- HUD Overlay -->
+        <div id="hud-layer">
+          <div class="hud-row">
+            <div class="hud-item">
+              <span class="hud-bracket">┌</span>
+              <span class="hud-text" id="hud-title">CLAUDE — MOTION REEL 2026</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-text" id="hud-tc">TC 00:00:00:00</span>
+              <span class="hud-bracket">┐</span>
+            </div>
+          </div>
+          <div class="hud-row">
+            <div class="hud-item">
+              <span class="hud-bracket">└</span>
+              <span class="hud-text" id="hud-section">00 / INTRO</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-text">120 BPM</span>
+              <div class="bpm-boxes">
+                <span class="bpm-box" id="bpm-0"></span>
+                <span class="bpm-box" id="bpm-1"></span>
+                <span class="bpm-box" id="bpm-2"></span>
+                <span class="bpm-box" id="bpm-3"></span>
+              </div>
+              <span class="hud-bracket">┘</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Start Click Mask -->
+        <div id="start-screen">
+          <div class="play-circle">
+            <div class="play-icon"></div>
+          </div>
+          <div class="start-title">CLAUDE • MOTION REEL 2026</div>
+          <div class="start-sub">CLICK TO PLAY WITH 120 BPM AUDIO • 452 FRAMES</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Player Controls -->
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-play">
+      <span id="play-icon">▶</span> <span id="play-text">PLAY</span>
+    </button>
+    <button class="ctrl-btn" id="btn-step-prev" title="Previous Frame (Hotkey: [)">◄</button>
+    <button class="ctrl-btn" id="btn-step-next" title="Next Frame (Hotkey: ])">►</button>
+    <div id="scrubber-container">
+      <input type="range" id="scrubber" min="0" max="452" value="0" step="1">
+    </div>
+    <div id="time-display">
+      <b id="disp-frame">F 000</b> <span id="disp-sec">/ 15.07s</span>
+    </div>
+    <button class="ctrl-btn" id="btn-speed">1.0X</button>
+    <button class="ctrl-btn" id="btn-sound">🔊 AUDIO</button>
+    <button class="ctrl-btn" id="btn-compare">⚔ COMPARE</button>
+    <button class="ctrl-btn" id="btn-fs">⛶</button>
+  </div>
+
+  <!-- Embedded Audio File Data -->
+  <script src="audio_data.js"></script>
+  <!-- Motion Engine Script -->
+  <script src="reel_engine.js"></script>
+</body>
+</html>
