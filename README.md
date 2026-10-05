@@ -1,4 +1,23 @@
-# original-video
+# Motion Design Showreel
+
+This repository now includes a custom **15-second procedural motion-design showreel** inspired by the pacing, graphic language, and craft of `original.mp4`—without copying its exact frames.
+
+## Final deliverable
+
+- **`showreel.mp4`** — 1280×720, 30 fps, H.264/AAC, exactly 15 seconds
+- Features kinetic typography, easing-curve animation, modular graphic systems, dimensional tiles, a particle globe, rapid typographic cuts, and a résumé-ready end card for **Rohan Rathod**
+- Includes a custom-generated electronic soundtrack synchronized to the edit
+
+## Re-render
+
+```bash
+npm install
+npm run render
+```
+
+The full deterministic animation and audio source is in `render.js`. It renders every frame through Canvas and encodes the final MP4 using the repository's npm-managed FFmpeg binary.
+
+## Reference video
 
 Repository hosting `original.mp4` for AI agents, automated workflows, and direct downloads.
 
